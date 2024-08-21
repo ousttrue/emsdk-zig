@@ -156,3 +156,18 @@ pub fn emLinkStep(
 
     return install;
 }
+
+// build a run step which uses the emsdk emrun command to run a build target in the browser
+// NOTE: ideally this would go into a separate emsdk-zig package
+pub const EmRunOptions = struct {
+    name: []const u8,
+};
+pub fn emRunStep(
+    b: *std.Build,
+    emsdk: *std.Build.Dependency,
+    options: EmRunOptions,
+) *std.Build.Step.Run {
+    const emrun_path = b.findProgram(&.{"emrun"}, &.{}) catch emsdk.path(b.pathJoin(&.{ "upstream", "emscripten", "emrun" })).getPath(b);
+    const emrun = b.addSystemCommand(&.{ emrun_path, "--no_browser", b.fmt("{s}/web/{s}.html", .{ b.install_path, options.name }) });
+    return emrun;
+}
