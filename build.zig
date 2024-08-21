@@ -2,6 +2,7 @@ const std = @import("std");
 const build_emsdk = @import("build_emsdk.zig");
 pub const EmLinkOptions = build_emsdk.EmLinkOptions;
 pub const emLinkStep = build_emsdk.emLinkStep;
+pub const emSdkSetupStep = build_emsdk.emSdkSetupStep;
 
 const StepType = enum {
     run,
