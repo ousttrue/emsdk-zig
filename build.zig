@@ -11,4 +11,13 @@ pub fn build(b: *std.Build) !void {
         // https://github.com/ziglang/zig/issues/5202
         b.default_step.dependOn(&run.step);
     }
+
+    const build_examples = if (b.option(bool, "examples", "build examples")) |enable|
+        enable
+    else
+        false;
+    if (build_examples) {
+        const examples = @import("examples/build.zig");
+        try examples.build(b);
+    }
 }
