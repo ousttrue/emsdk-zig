@@ -75,11 +75,11 @@ pub const EmLinkOptions = struct {
     extra_after: []const []const u8 = &.{},
 };
 /// *std.Build.Step.Compile(zig-out/lib/xxx.a) => xxx.wasm
-pub fn emLinkStep(
+pub fn emLinkCommand(
     b: *std.Build,
     emsdk: *std.Build.Dependency,
     options: EmLinkOptions,
-) !*std.Build.Step.InstallDir {
+) !*std.Build.Step.Run {
     const emcc = createEmcc(b, emsdk);
     if (try emSdkSetupStep(b, emsdk)) |setup| {
         emcc.step.dependOn(&setup.step);
@@ -139,6 +139,15 @@ pub fn emLinkStep(
         }
     }
 
+    return emcc;
+}
+
+pub fn emLinkStep(
+    b: *std.Build,
+    emsdk: *std.Build.Dependency,
+    options: EmLinkOptions,
+) !*std.Build.Step.InstallDir {
+    const emcc = try emLinkCommand(b, emsdk, options);
     emcc.addArg("-o");
     const out_file = emcc.addOutputFileArg(b.fmt("{s}.html", .{options.lib_main.name}));
 

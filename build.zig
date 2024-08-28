@@ -1,8 +1,9 @@
 const std = @import("std");
 const build_emsdk = @import("build_emsdk.zig");
+const emSdkSetupStep = build_emsdk.emSdkSetupStep;
 pub const EmLinkOptions = build_emsdk.EmLinkOptions;
+pub const emLinkCommand = build_emsdk.emLinkCommand;
 pub const emLinkStep = build_emsdk.emLinkStep;
-pub const emSdkSetupStep = build_emsdk.emSdkSetupStep;
 pub const emRunStep = build_emsdk.emRunStep;
 
 pub fn build(b: *std.Build) !void {
