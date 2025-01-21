@@ -122,9 +122,8 @@ pub fn emLinkCommand(
 
     // add the main lib, and then scan for library dependencies and add those too
     emcc.addArtifactArg(options.lib_main);
-    var it = options.lib_main.root_module.iterateDependencies(options.lib_main, false);
-    while (it.next()) |item| {
-        for (item.module.link_objects.items) |link_object| {
+    for (options.lib_main.root_module.getGraph().modules) |module| {
+        for (module.link_objects.items) |link_object| {
             switch (link_object) {
                 .other_step => |compile_step| {
                     switch (compile_step.kind) {
