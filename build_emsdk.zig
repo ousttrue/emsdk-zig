@@ -73,6 +73,7 @@ pub const EmLinkOptions = struct {
     extra_before: []const []const u8 = &.{},
     // for "-sSIDE_MODULE" placeholder
     extra_after: []const []const u8 = &.{},
+    after_setup: []const *std.Build.Step = &.{},
 };
 /// *std.Build.Step.Compile(zig-out/lib/xxx.a) => xxx.wasm
 pub fn emLinkCommand(
@@ -83,6 +84,9 @@ pub fn emLinkCommand(
     const emcc = createEmcc(b, emsdk);
     if (try emSdkSetupStep(b, emsdk)) |setup| {
         emcc.step.dependOn(&setup.step);
+        for (options.after_setup) |d| {
+            d.*.dependOn(&setup.step);
+        }
     }
     emcc.setName("emcc"); // hide emcc path
     if (options.optimize == .Debug) {
