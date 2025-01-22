@@ -106,6 +106,8 @@ pub fn emLinkCommand(
     }
     if (options.use_webgl2) {
         emcc.addArg("-sUSE_WEBGL2=1");
+        emcc.addArg("-sMIN_WEBGL_VERSION=2");
+        emcc.addArg("-sMAX_WEBGL_VERSION=2");
     }
     if (!options.use_filesystem) {
         emcc.addArg("-sNO_FILESYSTEM=1");
