@@ -23,15 +23,17 @@ fn compileInstallRun(
     optimize: std.builtin.OptimizeMode,
     opts: CompileOptoins,
 ) !Step {
-    if (target.result.isWasm()) {
+    if (target.result.cpu.arch.isWasm()) {
         if (target.result.os.tag == .emscripten) {
             // wasm32-emscripten
-            const lib = b.addStaticLibrary(.{
+            const lib = b.addLibrary(.{
                 .name = opts.name,
-                .root_source_file = b.path(opts.root_source_file),
-                .target = target,
-                .optimize = optimize,
-                .link_libc = true,
+                .root_module = b.addModule(opts.name, .{
+                    .root_source_file = b.path(opts.root_source_file),
+                    .target = target,
+                    .optimize = optimize,
+                    .link_libc = true,
+                }),
             });
             lib.rdynamic = true;
 
@@ -46,7 +48,7 @@ fn compileInstallRun(
                 // .shell_file_path = deps.dep_sokol.path("src/sokol/web/shell.html").getPath(b),
                 .release_use_closure = false,
                 .extra_before = &.{
-                    "-sUSE_OFFSET_CONVERTER=1",
+                    // "-sUSE_OFFSET_CONVERTER=1",
                 },
             });
 
@@ -60,10 +62,12 @@ fn compileInstallRun(
             // wasm32-freestanding
             const exe = b.addExecutable(.{
                 .name = opts.name,
-                .root_source_file = b.path(opts.root_source_file),
-                .target = target,
-                .optimize = optimize,
-                .link_libc = true,
+                .root_module = b.addModule(opts.name, .{
+                    .root_source_file = b.path(opts.root_source_file),
+                    .target = target,
+                    .optimize = optimize,
+                    .link_libc = true,
+                }),
             });
             exe.entry = .disabled;
             exe.rdynamic = true;
@@ -90,10 +94,12 @@ fn compileInstallRun(
     } else {
         const exe = b.addExecutable(.{
             .name = opts.name,
-            .root_source_file = b.path(opts.root_source_file),
-            .target = target,
-            .optimize = optimize,
-            .link_libc = true,
+            .root_module = b.addModule(opts.name, .{
+                .root_source_file = b.path(opts.root_source_file),
+                .target = target,
+                .optimize = optimize,
+                .link_libc = true,
+            }),
         });
         const install = b.addInstallArtifact(exe, .{});
         b.getInstallStep().dependOn(&install.step);

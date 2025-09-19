@@ -17,10 +17,11 @@ fn createEmsdkStep(b: *std.Build, emsdk: *std.Build.Dependency) *std.Build.Step.
 fn createEmcc(
     b: *std.Build,
     emsdk: *std.Build.Dependency,
+    python_version: []const u8, // "3.9.2-nuget_64bit"
 ) *std.Build.Step.Run {
     if (builtin.os.tag == .windows) {
         // emcc.bat workaround
-        const em_py = emsdk.path(b.pathJoin(&.{ "python", "3.9.2-nuget_64bit", "python.exe" })).getPath(b);
+        const em_py = emsdk.path(b.pathJoin(&.{ "python", python_version, "python.exe" })).getPath(b);
         const emcc_py = emsdk.path(b.pathJoin(&.{ "upstream", "emscripten", "emcc.py" })).getPath(b);
         return b.addSystemCommand(&.{ em_py, emcc_py });
     } else {
@@ -74,6 +75,7 @@ pub const EmLinkOptions = struct {
     // for "-sSIDE_MODULE" placeholder
     extra_after: []const []const u8 = &.{},
     after_setup: []const *std.Build.Step = &.{},
+    python_version: []const u8 = "3.13.3_64bit",
 };
 /// *std.Build.Step.Compile(zig-out/lib/xxx.a) => xxx.wasm
 pub fn emLinkCommand(
@@ -81,7 +83,7 @@ pub fn emLinkCommand(
     emsdk: *std.Build.Dependency,
     options: EmLinkOptions,
 ) !*std.Build.Step.Run {
-    const emcc = createEmcc(b, emsdk);
+    const emcc = createEmcc(b, emsdk, options.python_version);
     if (try emSdkSetupStep(b, emsdk)) |setup| {
         emcc.step.dependOn(&setup.step);
         for (options.after_setup) |d| {
