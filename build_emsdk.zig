@@ -69,8 +69,7 @@ pub const EmLinkOptions = struct {
     use_webgl2: bool = false,
     use_emmalloc: bool = false,
     use_filesystem: bool = true,
-    // FIXME: this should be a LazyPath?
-    shell_file_path: ?[]const u8 = null,
+    shell_file_path: ?std.Build.LazyPath = null,
     extra_before: []const []const u8 = &.{},
     // for "-sSIDE_MODULE" placeholder
     extra_after: []const []const u8 = &.{},
@@ -122,7 +121,8 @@ pub fn emLinkCommand(
         emcc.addArg("-sMALLOC='emmalloc'");
     }
     if (options.shell_file_path) |shell_file_path| {
-        emcc.addArg(b.fmt("--shell-file={s}", .{shell_file_path}));
+        emcc.addArg("--shell-file");
+        emcc.addFileArg(shell_file_path);
     }
     for (options.extra_before) |arg| {
         emcc.addArg(arg);
